@@ -27,23 +27,9 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+set.seed(1)
 ```
-
-
-### Due date
-
-Due: November 16 at 11:59pm. 
-
-### Points
-
-| Problem         | Points    |
-|:--------------- |:--------- |
-| Problem 0       | 20        |
-| Problem 1       | --        |
-| Problem 2       | 40        |
-| Problem 3       | 40        |
-| Optional survey | No points |
-
 
 ### Problem 0
 
@@ -96,5 +82,7 @@ tidy_df %>%
 ```
 
 This plot suggests high within-subject correlation -- subjects who start above average end up above average, and those that start below average end up below average. Subjects in the control group generally don't change over time, but those in the experiment group increase their outcome in a roughly linear way. 
+
+## Problem 3
 
 
