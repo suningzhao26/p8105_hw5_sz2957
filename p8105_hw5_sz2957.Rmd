@@ -231,3 +231,20 @@ simulation_df %>%
   )
 ```
 
+### Make a plot showing the average estimate of mu on the y axis and the true value of u on the x axis
+
+```{r}
+estimate_true_plot = 
+  simulation_df %>% 
+  group_by(mu) %>% 
+  summarize(
+    avg_est = mean(estimate)) %>% 
+  ggplot(aes(x = mu, y = avg_est)) + 
+  geom_point() +
+  geom_line() + 
+  labs( 
+    title = "Average estimate of u vs true value of u",
+    x = "True value of mu",
+    y = "Average Estimate of mu")
+```
+
