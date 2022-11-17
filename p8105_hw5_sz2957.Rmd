@@ -81,15 +81,17 @@ This plot suggests high within-subject correlation -- subjects who start above a
 
 ### Raw Data Import and Description
 
-The code chunk below imports the data from github website. To do this, I create a dataframe using `read_csv` to read the csv file. Then, I add a new variable `city_state` to illustrate the city and state together.
+* The code chunk below imports the data from github website. To do this, I create a dataframe using `read_csv` to read the csv file. Then, I add a new variable `city_state` to illustrate the city and state together.
+* I notice that in one sample, Tusla has been wrongly allocated to AL instead of OK. I have solved that by `str_replace`
 
 ```{r, message=FALSE, warning=FALSE}
 homicides_raw_df = 
   read_csv("data/homicide-data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
-    city_state = str_c(city,state,sep=",")
-  )
+    city_state = str_c(city,state,sep=",") %>% 
+    str_replace("Tulsa,AL", "Tulsa,OK")
+  ) 
 ```
 
 * The raw data includes `r ncol(homicides_raw_df)` columns and `r nrow(homicides_raw_df)`. 
