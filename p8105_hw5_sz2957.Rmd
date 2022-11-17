@@ -9,6 +9,9 @@ output: github_document
 library(tidyverse)
 library(p8105.datasets)
 library(viridis)
+library(purrr)
+library(patchwork)
+library(rvest)
 
 knitr::opts_chunk$set(
 	echo = TRUE,
@@ -29,14 +32,6 @@ scale_fill_discrete = scale_fill_viridis_d
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 set.seed(1)
-```
-
-### Problem 0
-
-This "problem" focuses on structure of your submission, especially the use git and GitHub for reproducibility, R Projects to organize your work, R Markdown to write reproducible reports, relative paths to load data from local files, and reasonable naming structures for your files. This was not prepared as a GitHub repo.
-
-```{r load_libraries}
-library(tidyverse)
 ```
 
 
@@ -212,3 +207,27 @@ simulation_df =
   unnest(t_test_df) %>% 
   rename(p_value = p.value)
 ```
+
+### Making Plots showing the proportion of times the null was rejected
+
+```{r}
+simulation_df %>% 
+  mutate(
+    reject = if_else(p_value < 0.05, "Reject", "Fail")) %>%
+  group_by(mu, reject) %>%
+  summarize(
+    num_reject = n()) %>%
+  mutate(
+    prop_reject = num_reject/5000) %>%
+  filter(reject == "Reject") %>%
+  ggplot(
+    aes(x = mu, y = prop_reject)) +
+  geom_point() + 
+  geom_line() + 
+  labs(
+    title = "Association between effect size and power of the t-test",
+    x = "True value of mean",
+    y = "Proportion of times the null was rejected"
+  )
+```
+
