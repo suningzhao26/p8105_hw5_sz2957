@@ -168,6 +168,8 @@ homicides_test_df %>%
 
 ### Set design elements:
 
+According to the requirement, build a function for t-test, based on a random selected dataset from normal distribution that fix n = 30 and sigma = 5
+
 ```{r}
 t_test = function(n = 30, mu, sigma = 5) {
   simulation_data = tibble(
@@ -193,7 +195,7 @@ simulation_df_0 =
   unnest(t_test_df)
 ```
 
-### Repeat test for u = 1-6
+### Repeat test for u = 1:6
 
 ```{r}
 simulation_df = 
@@ -233,22 +235,8 @@ simulation_df %>%
   )
 ```
 
-### Make a plot showing the average estimate of mu on the y axis and the true value of u on the x axis
-
-```{r}
-estimate_true_plot = 
-  simulation_df %>% 
-  group_by(mu) %>% 
-  summarize(
-    avg_est = mean(estimate)) %>% 
-  ggplot(aes(x = mu, y = avg_est)) + 
-  geom_point() +
-  geom_line() + 
-  labs( 
-    title = "Average estimate of u vs true value of u",
-    x = "True value of mu",
-    y = "Average Estimate of mu")
-```
+* Based on the result, we can know that as the true mean increases, the proportion of times the null was rejected also increases. It is approaching to 1 when the true mean is closing to 6.
+* Since the power of the test is the proportion of times the null was rejected and the effect size is the difference between true mean and 0, we can know that the larger the effect size is, the higher the power of test is. 
 
 ### Make a plot showing the average estimate of mu on the y axis and the true value of u on the x axis
 ```{r}
@@ -275,13 +263,16 @@ simulation_average %>%
 ggplot(aes(x = mu, y = estimate_avg, color = data)) +
   geom_point() + 
   geom_path() +
-  scale_x_continuous( breaks = 1:6 )+
-  scale_y_continuous( breaks = 1:6 )+
+  scale_x_continuous( breaks = 1:6 ) +
+  scale_y_continuous( breaks = 1:6 ) +
   labs(
-    title = "Average estimate of miu vs. True Mean",
-    x = "True Mean",
-    y = "Average estimate of miu(1:6)"
+    title = "Average estimate of mu vs. True mu",
+    x = "True mu",
+    y = "Average estimate of mu"
   ) + 
   theme(legend.position = "bottom")
 ```
 
+* According to the graph, we can know that when mu is less than 3, the sample average of mu across tests for which the null is rejected is higher than true value of mu.
+* When mu is higher than 4, it is suggested that the sample average of mu across tests for which the null is rejected is approximately equal to the true value of mu.
+* From last graph we can know that the power is relatively lower when mu is less than 3. That is the reason why the sample average is higher than the true value of mu when mu is less than 3. Under a lower power, the estimates of mu is not precise, which we should pay attention in statistical analysis.
