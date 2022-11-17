@@ -214,6 +214,8 @@ simulation_df_0 =
     t_test_df = map(.x = mu, ~t_test(mu = .x))
     ) %>%
   unnest(t_test_df)
+
+simulation_df_0
 ```
 
 ### Repeat test for u = 1:6
@@ -228,6 +230,8 @@ simulation_df =
     ) %>%
   unnest(t_test_df) %>% 
   rename(p_value = p.value)
+
+simulation_df
 ```
 
 ### Making Plots showing the proportion of times the null was rejected
