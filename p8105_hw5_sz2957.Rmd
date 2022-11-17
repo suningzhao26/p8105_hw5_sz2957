@@ -38,7 +38,7 @@ set.seed(1)
 
 The code chunk below imports the data in individual spreadsheets contained in `./data/zip_data/`. To do this, I create a dataframe that includes the list of all files in that directory and the complete path to each file. As a next step, I `map` over paths and import data using the `read_csv` function. Finally, I `unnest` the result of `map`.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 full_df = 
   tibble(
     files = list.files("data/zip_data/"),
@@ -79,18 +79,27 @@ This plot suggests high within-subject correlation -- subjects who start above a
 
 ## Problem 2
 
-### Raw Data Cleaning and Description
+### Raw Data Import and Description
 
-The code chunk below imports the data from github website. To do this, I create a dataframe that includes 
+The code chunk below imports the data from github website. To do this, I create a dataframe using `read_csv` to read the csv file. Then, I add a new variable `city_state` to illustrate the city and state together.
 
-```{r, warning = FALSE}
+```{r, message=FALSE, warning=FALSE}
 homicides_raw_df = 
   read_csv("data/homicide-data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
     city_state = str_c(city,state,sep=",")
   )
+```
 
+* The raw data includes `r ncol(homicides_raw_df)` columns and `r nrow(homicides_raw_df)`. 
+* Important variables include `r colnames(homicides_raw_df)`, which are used to describe the homicide in 50 cities across US.
+
+### Summarize the total number of homicides and unsolved homicides
+
+* The code chunk below generates a table to summarize the total number of homicides and unsolved homicides in each cities.
+
+```{r}
 homicides_count_df = 
   homicides_raw_df %>% 
   mutate(
@@ -105,6 +114,8 @@ homicides_count_df %>%
 ```
 
 ### Estimate proprotion of homicides that are unsloved for Baltimore, MD
+
+* The code chunk below use `prop.test` function and `broom::tidy` to estimate the proportion of homicides that are unsolved in Baltimore, MD.
 
 ```{r}
 baltimore_count_df = 
@@ -128,7 +139,11 @@ baltimore_prop_df %>%
   knitr::kable(digits = 3)
 ```
 
+* From the result we can know that the estimated proportion of homicides that are unsolved in Baltimore is 0.646, with a confidence interval between 0.628 and 0.663
+
 ### Estimate proprotion of homicides that are unsloved for all cities
+
+* The code chunk below use `prop.test` function, `map2` and `broom::tidy` to estimate the proportion of homicides that are unsovled in all cities.
 
 ```{r}
 homicides_test_df = 
@@ -149,6 +164,9 @@ homicides_test_df %>%
 
 ### Creat a plot to show the estimates and CIs for each city
 
+* The code chunk below use `ggplot` to generate a plot to show the estimated proportion of unsolved homicides for each city.
+* We used `geom_errorbar` to create the plot. The cities are organized accroding to the proportion of unsolved homicides.
+
 ```{r}
 homicides_test_df %>%
   mutate(
@@ -158,6 +176,7 @@ homicides_test_df %>%
   geom_errorbar(aes(ymin = lower_limit, ymax = upper_limit, width = .3)) +
   theme(axis.text.x = element_text(angle = 75, hjust = 1), legend.position = "none") +
   labs(
+    title = "Proportion of unsolved homicides in large cities in the US",
     x = "Location (City/State)",
     y = "Proportion of unsolved homicides"
   )
