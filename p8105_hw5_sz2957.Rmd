@@ -97,14 +97,44 @@ homicides_raw_df =
 ```
 
 ```{r}
-homicides_raw_df %>%  
+homicides_total_df =
+  homicides_raw_df %>%  
   group_by(city_state) %>%
   summarize(
-    n_homicides = n(),
-    n_unsolved_homicides = sum(disposition == "Closed without arrest") + sum(disposition == "Open/No arrest")
-  )  %>% 
- knitr::kable(digits = 3) 
+    n_homicides = n()  
+    ) 
+
+homicides_unsolved_df =
+  homicides_raw_df %>%
+  filter(disposition != "Closed by arrest") %>% 
+  group_by(city_state) %>%
+  summarize(
+    n_homicides_unsolved = n()  
+    ) 
+
+homicides_count_df = 
+  full_join(homicides_total_df, homicides_unsolved_df) 
+
+homicides_count_df %>% 
+  knitr::kable(digits = 3) 
 ```
+
+```{r}
+baltimore_count_df = 
+  homicides_count_df %>% 
+  filter(city_state == "Baltimore,MD")
+
+prop_test = 
+  prop.test(
+    x = baltimore_count_df %>% pull(n_homicides_unsolved), 
+    n = baltimore_count_df %>% pull(n_homicides)) 
+
+baltimore_prop_df = broom::tidy(prop_test)
+
+baltimore_prop_df %>% 
+  select(estimate, conf.low, conf.high) 
+```
+
 
 
 ## Problem 3
