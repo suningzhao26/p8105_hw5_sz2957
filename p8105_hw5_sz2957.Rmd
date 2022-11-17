@@ -83,6 +83,30 @@ tidy_df %>%
 
 This plot suggests high within-subject correlation -- subjects who start above average end up above average, and those that start below average end up below average. Subjects in the control group generally don't change over time, but those in the experiment group increase their outcome in a roughly linear way. 
 
+## Problem 2
+
+The code chunk below imports the data from github website. To do this, I create a dataframe that includes 
+
+```{r}
+homicides_raw_df = 
+  read_csv("data/homicide-data.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    city_state = str_c(city,state,sep=",")
+  ) 
+```
+
+```{r}
+homicides_raw_df %>%  
+  group_by(city_state) %>%
+  summarize(
+    n_homicides = n(),
+    n_unsolved_homicides = sum(disposition == "Closed without arrest") + sum(disposition == "Open/No arrest")
+  )  %>% 
+ knitr::kable(digits = 3) 
+```
+
+
 ## Problem 3
 
 
