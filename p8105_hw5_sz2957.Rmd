@@ -85,39 +85,32 @@ This plot suggests high within-subject correlation -- subjects who start above a
 
 ## Problem 2
 
+### Raw Data Cleaning and Description
+
 The code chunk below imports the data from github website. To do this, I create a dataframe that includes 
 
-```{r}
+```{r, warning = FALSE}
 homicides_raw_df = 
   read_csv("data/homicide-data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
     city_state = str_c(city,state,sep=",")
-  ) 
-```
-
-```{r}
-homicides_total_df =
-  homicides_raw_df %>%  
-  group_by(city_state) %>%
-  summarize(
-    n_homicides = n()  
-    ) 
-
-homicides_unsolved_df =
-  homicides_raw_df %>%
-  filter(disposition != "Closed by arrest") %>% 
-  group_by(city_state) %>%
-  summarize(
-    n_homicides_unsolved = n()  
-    ) 
+  )
 
 homicides_count_df = 
-  full_join(homicides_total_df, homicides_unsolved_df) 
+  homicides_raw_df %>% 
+  mutate(
+    homicides_status = ifelse(disposition != "Closed by arrest", "unsolved", "solved")
+    ) %>% 
+  group_by(city_state) %>% 
+  summarise(n_unsolved = sum(homicides_status == "unsolved"),
+            n_total = n())
 
 homicides_count_df %>% 
   knitr::kable(digits = 3) 
 ```
+
+### Estimate proprotion of homicides that are unsloved in Baltimore, MD
 
 ```{r}
 baltimore_count_df = 
@@ -126,8 +119,8 @@ baltimore_count_df =
 
 prop_test = 
   prop.test(
-    x = baltimore_count_df %>% pull(n_homicides_unsolved), 
-    n = baltimore_count_df %>% pull(n_homicides)) 
+    x = baltimore_count_df %>% pull(n_unsolved), 
+    n = baltimore_count_df %>% pull(n_total)) 
 
 baltimore_prop_df = broom::tidy(prop_test)
 
@@ -135,6 +128,18 @@ baltimore_prop_df %>%
   select(estimate, conf.low, conf.high) 
 ```
 
+```{r}
+homicides_test_df = 
+  homicides_count_df %>%
+  mutate(
+      prop_test = map2(n_unsolved, n_total, ~ prop.test(.x, .y) %>%
+      broom::tidy())) %>%
+  unnest(prop_test) %>%
+  select(city_state, estimate, conf.low, conf.high)
+
+homicides_test_df %>% 
+  knitr::kable(digits = 3)
+```
 
 
 ## Problem 3
