@@ -10,7 +10,6 @@ library(tidyverse)
 library(p8105.datasets)
 library(viridis)
 library(purrr)
-library(patchwork)
 library(rvest)
 
 knitr::opts_chunk$set(
@@ -211,14 +210,17 @@ simulation_df =
 ### Making Plots showing the proportion of times the null was rejected
 
 ```{r}
-simulation_df %>% 
+simulation_df = 
+ simulation_df %>% 
   mutate(
-    reject = if_else(p_value < 0.05, "Reject", "Fail")) %>%
+    reject = if_else(p_value < 0.05, "Reject", "Fail")) 
+
+simulation_df %>% 
   group_by(mu, reject) %>%
   summarize(
     num_reject = n()) %>%
   mutate(
-    prop_reject = num_reject/5000) %>%
+    prop_reject = num_reject/5000) %>% 
   filter(reject == "Reject") %>%
   ggplot(
     aes(x = mu, y = prop_reject)) +
@@ -246,5 +248,40 @@ estimate_true_plot =
     title = "Average estimate of u vs true value of u",
     x = "True value of mu",
     y = "Average Estimate of mu")
+```
+
+### Make a plot showing the average estimate of mu on the y axis and the true value of u on the x axis
+```{r}
+average_total = 
+  simulation_df %>%
+  group_by(mu) %>% 
+  summarize(
+    estimate_avg = mean(estimate)
+    ) %>% 
+  mutate(data = "All")
+
+average_reject = 
+  simulation_df %>%
+  filter(reject == "Reject") %>% 
+  group_by(mu) %>% 
+  summarize(
+    estimate_avg = mean(estimate)
+    ) %>% 
+  mutate(data = "Reject")
+
+simulation_average = bind_rows(average_total, average_reject)
+
+simulation_average %>% 
+ggplot(aes(x = mu, y = estimate_avg, color = data)) +
+  geom_point() + 
+  geom_path() +
+  scale_x_continuous( breaks = 1:6 )+
+  scale_y_continuous( breaks = 1:6 )+
+  labs(
+    title = "Average estimate of miu vs. True Mean",
+    x = "True Mean",
+    y = "Average estimate of miu(1:6)"
+  ) + 
+  theme(legend.position = "bottom")
 ```
 
